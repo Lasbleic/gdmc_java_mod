@@ -50,7 +50,8 @@ This file contains all the metadata of your mod, like its description, its name,
 #### Start coding
 
 Once you are ready to code, just code, everything is made for you!
-All the Minecraft-related mecanisms are already handle, so you just have to fill the ```buildSettlement()``` method, in the class ```BuildSettlementCommand``` (you will see a TODO here).
+Delete the 'TODO' in the```buildSettlement()``` method, in the class ```BuildSettlementCommand``` and starting developping your algorithm.
+Don't hesitate to take a look at our [wiki](https://github.com/Lasbleic/gdmc_java_mod/wiki/)
 
 
 
