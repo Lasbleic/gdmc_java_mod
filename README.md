@@ -2,6 +2,7 @@
 
 This repo is just the Forge MDK with a different example mod.
 This template mod register, parse and execute the command "/buildsettlement x1 y1 z1 x2 y2 z2", printing a "Hello World!" plus coordinates.
+It also provides some basic functions considered useful to implement a village generator.
 
 ---
 
@@ -50,7 +51,7 @@ This file contains all the metadata of your mod, like its description, its name,
 #### Start coding
 
 Once you are ready to code, just code, everything is made for you!
-Delete the 'TODO' in the```buildSettlement()``` method, in the class ```BuildSettlementCommand``` and starting developping your algorithm.
+Delete the 'TODO' in the```buildSettlement()``` method, in the class ```BuildSettlementCommand``` and start developping your algorithm.
 Don't hesitate to take a look at our [wiki](https://github.com/Lasbleic/gdmc_java_mod/wiki/)!
 
 
