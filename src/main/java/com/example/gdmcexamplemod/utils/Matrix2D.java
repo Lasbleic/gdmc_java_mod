@@ -2,6 +2,9 @@ package com.example.gdmcexamplemod.utils;
 
 import java.util.Iterator;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
 /**
  * Represents a 2 dimension Matrix, with several accessors, and basic operations.
  *
@@ -34,6 +37,14 @@ public class Matrix2D<T> implements Iterable<T> {
         this.length = length;
 
         matrix = (T[][])new Object[length][width];
+    }
+
+    public Matrix2D(int width, int length, T fillerValue) {
+        this.width = width;
+        this.length = length;
+
+        matrix = (T[][])new Object[length][width];
+        fill(fillerValue);
     }
 
     /**
@@ -71,34 +82,85 @@ public class Matrix2D<T> implements Iterable<T> {
         return new Column(i);
     }
 
-    public void setRow(int rowIndex, T[] row) {
+    public SubMatrix2D getSubMatrix(int i1, int j1, int i2, int j2) {
 
-        if (!indexInLength(rowIndex)) throw new IllegalArgumentException("rowIndex must be : 0 <= rowIndex < matrix.length");
-        if (row.length != width) throw new IllegalArgumentException("The row's size must match the width of the matrix");
+        if (!coordinateInMatrix(i1, j1)) throw new IllegalArgumentException("First point in out of matrix boundaries");
+        if (!coordinateInMatrix(i2, j2)) throw new IllegalArgumentException("Second point in out of matrix boundaries");
 
-        Row rowToModify = new Row(rowIndex);
+        int minI = min(i1, i2);
+        int maxI = max(i1, i2);
+        int minJ = min(j1, j2);
+        int maxJ = max(j1, j2);
+
+        return new SubMatrix2D(minI, minJ, maxI, maxJ);
+    }
+
+    public void setRow(int rowIndex, T[] rowValues) {
+
+        if (rowValues.length != width) throw new IllegalArgumentException("The row's size must match the width of the matrix");
+
+        Row rowToModify = getRow(rowIndex);
+        setRow(rowToModify, rowValues);
+    }
+
+    public void setRow(Row row, T[] rowValues) {
+
+        if (rowValues.length != width) throw new IllegalArgumentException("The row's size must match the width of the matrix");
+
         for  (int i = 0; i < width; i++) {
-            rowToModify.set(i, row[i]);
+            row.set(i, rowValues[i]);
         }
     }
 
-    public void setColumn(int columnIndex, T[] column) {
+    public void setColumn(int columnIndex, T[] columnValues) {
 
-        if (!indexInWidth(columnIndex)) throw new IllegalArgumentException("rowIndex must be : 0 <= columnIndex < matrix.length");
-        if (column.length != length) throw new IllegalArgumentException("The row's size must match the width of the matrix");
+        if (columnValues.length != length) throw new IllegalArgumentException("The row's size must match the width of the matrix");
 
-        Column columnToModify = new Column(columnIndex);
-        for  (int j = 0; j < width; j++) {
-            columnToModify.set(j, column[j]);
+        Column columnToModify = getColumn(columnIndex);
+        setColumn(columnToModify, columnValues);
+    }
+
+    public void setColumn(Column column, T[] columnValues) {
+
+        if (columnValues.length != length) throw new IllegalArgumentException("The row's size must match the width of the matrix");
+
+        for  (int j = 0; j < length; j++) {
+            column.set(j, columnValues[j]);
+        }
+    }
+
+    public void setSubMatrix(int i1, int j1, int i2, int j2, Matrix2D<T> matrix) {
+
+        SubMatrix2D subMatrix = getSubMatrix(i1, j1, i2, j2);
+
+        setSubMatrix(subMatrix, matrix);
+    }
+
+    public void setSubMatrix(SubMatrix2D subMatrix, Matrix2D<T> matrix) {
+
+        if (subMatrix.length != matrix.length || subMatrix.width != matrix.width) throw new IllegalArgumentException("SubMatrix and given matrix must have same dimension");
+
+        for (int i = 0; i < subMatrix.width; i++) {
+            for (int j = 0; j < subMatrix.length; j++) {
+                subMatrix.setRelative(i, j, matrix.get(i, j));
+            }
+        }
+    }
+
+    public void fill(T value) {
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < length; j++) {
+                set(i, j, value);
+            }
         }
     }
 
     public boolean indexInWidth(int index) {
-        return 0 <= index && index < length;
+        return 0 <= index && index < width;
     }
 
     public boolean indexInLength(int index) {
-        return 0 <= index && index < width;
+        return 0 <= index && index < length;
     }
 
     public boolean coordinateInMatrix(int i, int j) {
@@ -109,7 +171,7 @@ public class Matrix2D<T> implements Iterable<T> {
     public Iterator<T> iterator() {
         return new MainIterator();
     }
-    
+
     //TODO: Test all methods
     //TODO: Adapt all for Point2D
 
@@ -208,8 +270,8 @@ public class Matrix2D<T> implements Iterable<T> {
             assert i1 < i2 && j1 < j2;
             this.originI = i1;
             this.originJ = j1;
-            this.width = i2 - i1;
-            this.length = j2 - j1;
+            this.width = i2 - i1 + 1;
+            this.length = j2 - j1 + 1;
         }
 
         public T getRelative(int relativeI, int relativeJ) {
@@ -247,11 +309,11 @@ public class Matrix2D<T> implements Iterable<T> {
         }
 
         public boolean indexInSubWidth(int index) {
-            return 0 <= index && index < length;
+            return 0 <= index && index < width;
         }
 
         public boolean indexInSubLength(int index) {
-            return 0 <= index && index < width;
+            return 0 <= index && index < length;
         }
 
         public boolean relativeCoordinateInSubMatrix(int i, int j) {
